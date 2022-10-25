@@ -12,20 +12,6 @@ const getOpenAPIPathParameters = (api: ControllerAPI) => {
     };
   }> = [];
 
-  if (Array.isArray(api.param)) {
-    api.param.forEach(item => {
-      parameters.push({
-        name: item.key,
-        in: 'path',
-        required: !item.nullable && !item.default,
-        description: item.example || item.default || item.key,
-        schema: {
-          type: Array.isArray(item.type) ? item.type[0] : item.type,
-        },
-      });
-    });
-  }
-
   if (Array.isArray(api.params)) {
     api.params.forEach(item => {
       parameters.push({

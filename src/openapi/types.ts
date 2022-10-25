@@ -53,7 +53,6 @@ export type ControllerAPI<P = any, Q = any, B = any> = {
   path: string;
   method: ControllerAPIMethod;
   middlewares?: Array<any>;
-  param?: ValidatorItem[];
   params?: ValidatorItem[];
   query?: ValidatorItem[];
   header?: ValidatorItem[];

@@ -1,4 +1,4 @@
-import { ControllerAPI, ValidationItemType, ValidatorItem } from '../express';
+import { type ControllerAPI, type ValidationItemType, type ValidatorItem } from '../openapi';
 
 export type SDKSource = {
   name: string;
@@ -15,9 +15,10 @@ export class APITreeItem {
   readonly path: string;
   readonly method: string;
   readonly summary: string | undefined;
-  public param: Parameter[] = [];
+  public params: Parameter[] = [];
   public query: Parameter[] = [];
   public body: Parameter[] = [];
+
   // TODO: Response Type
   // readonly response: Response[];
 
@@ -26,9 +27,9 @@ export class APITreeItem {
     this.path = api.path;
     this.method = api.method;
     this.summary = api.summary;
-    if (api.param) this.param = api.param.map(item => new Parameter(item));
-    if (api.query) this.query = api.query.map(item => new Parameter(item));
-    if (api.body) this.body = api.body.map(item => new Parameter(item));
+    if (api.params) this.params = api.params.map((item: any) => new Parameter(item));
+    if (api.query) this.query = api.query.map((item: any) => new Parameter(item));
+    if (api.body) this.body = api.body.map((item: any) => new Parameter(item));
   }
 
   public getImportSource(): string {
@@ -39,9 +40,9 @@ export class APITreeItem {
     return `
 export interface ${this.interfaceName} {
     ${
-      this.param.length > 0
-        ? `params${this.param.every(item => item.required) ? '' : '?'}: {
-        ${this.param.map(item => item.getTypescriptInterface()).join('\n')}
+      this.params.length > 0
+        ? `params${this.params.every(item => item.required) ? '' : '?'}: {
+        ${this.params.map(item => item.getTypescriptInterface()).join('\n')}
     }
 `
         : ''
@@ -67,7 +68,7 @@ export interface ${this.interfaceName} {
     return `
 export const ${this.name} = async (request: ${this.interfaceName}) => {
     let url = '${this.path}';${
-      this.param.length > 0
+      this.params.length > 0
         ? `
     if (request.params && Object.keys(request.params).length > 0) {
         url = url.replace(/:(\\w+)/g, (match, key) => {
@@ -110,7 +111,7 @@ ${this.body
           ? 'req'
           : 'request.body'
         : `{${
-            this.param.length > 0
+            this.params.length > 0
               ? `
             params: request.params,
             `

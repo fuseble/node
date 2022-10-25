@@ -47,13 +47,19 @@ const getOpenAPIPathRequestBody = (api: ControllerAPI) => {
     const example: Record<string, any> = {};
     if (Array.isArray(api.body)) {
       api.body.forEach(item => {
-        let type = item.type;
-        if (item.nullable) type += ' | null';
+        const type = item.type;
         if (item.example) {
           example[item.key] = item.example;
         } else if (item.default) {
           example[item.key] = item.default;
-        } else example[item.key] = item.type === 'array' || item.type === 'object' ? convertOpenAPIItems(item) : type;
+        } else if (item.type === 'array') {
+          example[item.key] = ['array1', 'array2', 1, 2];
+        } else if (item.type === 'object') {
+          example[item.key] = {
+            key1: 'value1',
+            key2: 'value2',
+          };
+        }
       });
     }
 

@@ -11,9 +11,7 @@ export const OPEN_API_RESPONSES = {
 };
 
 export const getNullableField = (item: ValidatorItem, target: string): string => {
-  let field = target;
-
-  if (item.nullable) field += ' | null';
+  const field = target;
 
   return field;
 };

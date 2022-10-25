@@ -9,14 +9,12 @@ export type { JSONSchemaType, JTDDataType };
 type UnknownSchemaType = JSONSchemaType<Record<string, any>>;
 
 export type CreateMiddlewareProps<P, Q, B> = {
-  param?: JSONSchemaType<P> | UnknownSchemaType;
   params?: JSONSchemaType<P> | UnknownSchemaType;
   query?: JSONSchemaType<Q> | UnknownSchemaType;
   body?: JSONSchemaType<B> | UnknownSchemaType;
 };
 
 export type ValidatorMiddleware<P, Q, B> = {
-  param?: ValidateFunction<P>;
   params?: ValidateFunction<P>;
   query?: ValidateFunction<Q>;
   body?: ValidateFunction<B>;
@@ -62,7 +60,7 @@ export default class Validator {
         const controllerAPI = value as ControllerAPI;
 
         Object.entries(value).forEach(([key, value]: [string, any]) => {
-          if (key === 'param' || key === 'params' || key === 'query' || key === 'body') {
+          if (key === 'params' || key === 'query' || key === 'body') {
             apiValidators[key] = this.createValidators(value as ValidatorItem[]);
           }
         });
@@ -161,24 +159,18 @@ export default class Validator {
     const ajv: Ajv = (() => {
       const options: Options = {};
 
-      if (props.param || props.params) options.coerceTypes = true;
+      if (props.params) options.coerceTypes = true;
 
       return new Ajv(options);
     })();
 
     const validators: ValidatorMiddleware<P, Q, B> = {};
-
-    if (props.param) {
-      validators.param = ajv.compile<P>(props.param);
-    }
     if (props.params) {
       validators.params = ajv.compile<P>(props.params);
     }
-
     if (props.query) {
       validators.query = ajv.compile<Q>(props.query);
     }
-
     if (props.body) {
       validators.body = ajv.compile<B>(props.body);
     }
@@ -186,9 +178,9 @@ export default class Validator {
     return (req: Request, res: Response, next: NextFunction) => {
       let errorMessage = '';
 
-      if (req.params && validators.param) {
-        const validation = validators.param(Validator.#parse(req.params, controllerAPI.param ?? []));
-        errorMessage = this.getErrorMessage(validators.param.errors) ?? '';
+      if (req.params && validators.params) {
+        const validation = validators.params(Validator.#parse(req.params, controllerAPI.params ?? []));
+        errorMessage = this.getErrorMessage(validators.params.errors) ?? '';
 
         if (!validation) {
           return next({
