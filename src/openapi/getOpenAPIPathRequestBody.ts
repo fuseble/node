@@ -1,5 +1,34 @@
-import { ControllerAPI } from './types';
+import { type ControllerAPI, type ValidatorItem } from './types';
 import { convertOpenAPIItems } from './constant';
+
+const getRequestBodyExample = (body?: ValidatorItem[]) => {
+  const examples: Record<string, any> = {};
+  if (!body) return examples;
+
+  body.forEach(item => {
+    const { key } = item;
+
+    if (item.example) examples[key] = item.example;
+    else if (item.default) examples[key] = item.default;
+    else if (item.type === 'string') examples[key] = 'string';
+    else if (item.type === 'number') examples[key] = 123;
+    else if (item.type === 'boolean') examples[key] = true;
+    else if (item.type === 'array') {
+      if (item.items === 'string') examples[key] = ['string1', 'string2'];
+      if (item.items === 'number') examples[key] = [1, 2, 3];
+      if (item.items === 'boolean') examples[key] = [true, false];
+    } else if (item.type === 'object') {
+      examples[key] = {
+        key1: 'value1',
+        key2: 'value2',
+      };
+    } else if (item.type === 'any') {
+      examples[key] = 'any';
+    }
+  });
+
+  return examples;
+};
 
 const getOpenAPIPathRequestBody = (api: ControllerAPI) => {
   if (api.method === 'GET') return null;
@@ -44,24 +73,7 @@ const getOpenAPIPathRequestBody = (api: ControllerAPI) => {
       },
     };
   } else {
-    const example: Record<string, any> = {};
-    if (Array.isArray(api.body)) {
-      api.body.forEach(item => {
-        const type = item.type;
-        if (item.example) {
-          example[item.key] = item.example;
-        } else if (item.default) {
-          example[item.key] = item.default;
-        } else if (item.type === 'array') {
-          example[item.key] = ['array1', 'array2', 1, 2];
-        } else if (item.type === 'object') {
-          example[item.key] = {
-            key1: 'value1',
-            key2: 'value2',
-          };
-        }
-      });
-    }
+    const example = getRequestBodyExample(api.body);
 
     const requestBody = {
       content: {
