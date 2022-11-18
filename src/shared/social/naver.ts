@@ -36,18 +36,8 @@ class Naver {
     };
 
     try {
-      const response = await axios.get(NAVER_URL.USER, { headers });
-      const { response: naverResponse } = response.data;
-
-      const { id, email, gender, age, mobile: phoneNumber } = naverResponse;
-
-      return {
-        id,
-        email,
-        gender,
-        age,
-        phoneNumber,
-      };
+      const { data } = await axios.get(NAVER_URL.USER, { headers });
+      return data;
     } catch (err) {
       return undefined;
     }

@@ -19,14 +19,9 @@ const getOpenAPIPaths = async (controllers: Record<string, any>) => {
       const api = value as ControllerAPI;
       const name = key.replace('API', '');
 
-      let description = api.description ? `# ${name}\n${api.description}` : `# ${name}`;
-
-      if (sdk[name]) {
-        description = description + `\n\`\`\`ts\n${sdk[name].source}\n\`\`\``;
-      }
-
       const path = getOpenAPIPath(api);
       const summary = getOpenAPIPathSummary(api, name);
+      const description = api.description ? `# ${name}\n${api.description}` : `# ${name}`;
       const security = getOpenAPIPathSecurity(api);
       const parameters = getOpenAPIPathParameters(api);
       const requestBody = getOpenAPIPathRequestBody(api);

@@ -71,7 +71,7 @@ export class InitApp {
 
     // default
     this.app.use(cors(corsOptions));
-    this.app.use(json());
+    this.app.use(json({}));
     this.app.use(urlencoded({ extended: true }));
     this.app.use(Express.static('public'));
     this.app.use(pagination());

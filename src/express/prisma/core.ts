@@ -1,43 +1,62 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
-import { DMMF, DMMFClass } from '@prisma/client/runtime';
 import { flatten, unflatten } from 'flat';
-import { type ExpressController } from '../express';
+import { type ExpressController } from '../index';
 
-export interface Dictionary<T> {
-  [key: string]: T;
+export enum ModelAction {
+  findUnique = 'findUnique',
+  findFirst = 'findFirst',
+  findMany = 'findMany',
+  create = 'create',
+  createMany = 'createMany',
+  update = 'update',
+  updateMany = 'updateMany',
+  upsert = 'upsert',
+  delete = 'delete',
+  deleteMany = 'deleteMany',
+  groupBy = 'groupBy',
+  count = 'count',
+  aggregate = 'aggregate',
+  findRaw = 'findRaw',
+  aggregateRaw = 'aggregateRaw',
 }
+export type PrismaCallback = (req: Request, res: Response, next: NextFunction, options: any) => any | Promise<any>;
 
 export type PrismaArgsWithCallback<T> = T & { callback?: PrismaCallback };
 
-export type PrismaCallback = (req: Request, res: Response, next: NextFunction, options: any) => any | Promise<any>;
+export type PrismaFunctionInterfaces = {
+  [key: string]: PrismaFunctionInterface;
+};
 
-export type PrismaFunctionInterface = Record<Partial<DMMF.ModelAction>, any> | undefined;
+export type PrismaFunctionInterface = {
+  [P in Partial<ModelAction>]: any;
+};
+
+export type PrismaFunctionsGroup = {
+  [key: string]: PrismaFunctions;
+};
+
+export type PrismaFunctions = {
+  [P in Partial<ModelAction>]: ExpressController;
+};
 
 export class PrismaCore {
   public prisma: PrismaClient;
   public modelNames: string[] = [];
 
-  public functions: Record<string, Partial<Record<Partial<DMMF.ModelAction>, ExpressController>>> = {};
-  public customs: Record<string, Partial<Record<Partial<DMMF.ModelAction>, ExpressController>>> = {};
+  public functions: PrismaFunctionsGroup = {};
+  public customs: PrismaFunctionsGroup = {};
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
-
-    const dmmf = (this.prisma as any)._baseDmmf as DMMFClass;
-    const modelMap = dmmf.modelMap;
-    this.modelNames = Object.keys(modelMap);
+    this.modelNames = Object.keys((this.prisma as any)._baseDmmf?.modelMap);
   }
 
-  public init<ModelClients = Record<string, PrismaFunctionInterface>>(options?: ModelClients) {
-    const functions = this.modelNames.reduce((acc, modelName) => {
+  public init<ModelClients = PrismaFunctionInterfaces>(options?: ModelClients) {
+    return this.modelNames.reduce((acc, modelName) => {
       const option = (options as any)?.[modelName];
       return { ...acc, [modelName]: this.create(modelName, modelName, option) };
     }, {});
-
-    this.functions = functions;
-
-    return functions;
   }
 
   public get<ModelClient = PrismaFunctionInterface>(modelName: string, option?: ModelClient) {
@@ -52,9 +71,14 @@ export class PrismaCore {
       ...this.#create(modelName, option),
       ...this.#delete(modelName, option),
       ...this.#update(modelName, option),
-    };
+    } as PrismaFunctions;
 
-    if (modelName !== name) {
+    if (modelName === name) {
+      this.functions = {
+        ...this.functions,
+        [name]: functionGroup,
+      };
+    } else {
       this.customs = {
         ...this.customs,
         [name]: functionGroup,
@@ -142,7 +166,7 @@ export class PrismaCore {
     return unflatten(options) as any;
   }
 
-  #find(modelName: keyof Dictionary<DMMF.Model>, _options?: any) {
+  #find(modelName: string, _options?: any) {
     const findUnique = async (req: Request, res: Response, next: NextFunction) => {
       const options = this.#requestOptions(req, _options?.findUnique);
 
@@ -203,7 +227,7 @@ export class PrismaCore {
     return { findUnique, findFirst, findMany };
   }
 
-  #create(modelName: keyof Dictionary<DMMF.Model>, _options?: any) {
+  #create(modelName: string, _options?: any) {
     const create = async (req: Request, res: Response, next: NextFunction) => {
       const options = this.#requestOptions(req, _options?.create);
 
@@ -239,8 +263,8 @@ export class PrismaCore {
     return { create, createMany };
   }
 
-  #delete(modelName: keyof Dictionary<DMMF.Model>, _options?: any) {
-    const _delete = async (req: Request, res: Response, next: NextFunction) => {
+  #delete(modelName: string, _options?: any) {
+    const deleteUniuqe = async (req: Request, res: Response, next: NextFunction) => {
       const options = this.#requestOptions(req, _options?.delete);
 
       try {
@@ -272,10 +296,10 @@ export class PrismaCore {
       }
     };
 
-    return { delete: _delete, deleteMany };
+    return { delete: deleteUniuqe, deleteMany };
   }
 
-  #update(modelName: keyof Dictionary<DMMF.Model>, _options?: any) {
+  #update(modelName: string, _options?: any) {
     const update = async (req: Request, res: Response, next: NextFunction) => {
       const options = this.#requestOptions(req, _options?.update);
 

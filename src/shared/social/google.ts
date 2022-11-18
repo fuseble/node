@@ -13,6 +13,7 @@ interface IGoogle {
 }
 
 export type GoogleUser = GoogleSocial.User;
+
 export class Google {
   private clientId: string;
   private clientSecret: string | undefined;
@@ -55,15 +56,8 @@ export class Google {
 
   static async getAppUser(token: string): Promise<GoogleSocial.User | undefined> {
     try {
-      const response = await axios.get(GOOGLE_URL.USER_APP(token));
-      const { id, email, name: nickname, picture: profileImage } = response.data;
-
-      return {
-        id,
-        email,
-        nickname,
-        profileImage,
-      };
+      const { data } = await axios.get(GOOGLE_URL.USER_APP(token));
+      return data;
     } catch (error: any) {
       const { response } = error;
       if (response.data.error === 'invalid_token') throw { status: 403, message: 'GOOGLE_TOKEN_EXPIRED' };
