@@ -25,7 +25,8 @@ export type PrismaCallback = (req: Request, res: Response, next: NextFunction, o
 export type PrismaArgsWithCallback<T> = T & { callback?: PrismaCallback };
 
 export type PrismaFunctionInterfaces = {
-  [key: string]: PrismaFunctionInterface;
+  [key: string]: PrismaFunctionInterface | string;
+  function?: string;
 };
 
 export type PrismaFunctionInterface = {
@@ -51,10 +52,10 @@ export class PrismaCore {
     this.modelNames = Object.keys((this.prisma as any)._baseDmmf?.modelMap);
   }
 
-  public init<ModelClients = PrismaFunctionInterfaces>(functionName?: string, options?: ModelClients) {
+  public init<ModelClients = PrismaFunctionInterfaces>(options?: ModelClients) {
     return this.modelNames.reduce((acc, modelName) => {
       const option = (options as any)?.[modelName];
-      return { ...acc, [modelName]: this.create(modelName, functionName ?? modelName, option) };
+      return { ...acc, [modelName]: this.create(modelName, option?.function ?? modelName, option) };
     }, {});
   }
 
