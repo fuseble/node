@@ -206,7 +206,13 @@ export class PrismaCore {
     };
 
     const findMany = async (req: Request, res: Response, next: NextFunction) => {
-      const options = await this.#requestOptions(req, _options?.findMany);
+      const page = (req.query?.page || '1') as string;
+      const limit = (req.query?.limit || '20') as string;
+
+      const take = Number(limit) || 20;
+      const skip = (Number(page) - 1) * take;
+
+      const options = { ...(await this.#requestOptions(req, _options?.findMany)), skip, take };
 
       try {
         if (options.callback) {
