@@ -45,17 +45,16 @@ export class PrismaCore {
   public modelNames: string[] = [];
 
   public functions: PrismaFunctionsGroup = {};
-  public customs: PrismaFunctionsGroup = {};
 
   constructor(prisma: PrismaClient) {
     this.prisma = prisma;
     this.modelNames = Object.keys((this.prisma as any)._baseDmmf?.modelMap);
   }
 
-  public init<ModelClients = PrismaFunctionInterfaces>(options?: ModelClients) {
+  public init<ModelClients = PrismaFunctionInterfaces>(functionName?: string, options?: ModelClients) {
     return this.modelNames.reduce((acc, modelName) => {
       const option = (options as any)?.[modelName];
-      return { ...acc, [modelName]: this.create(modelName, modelName, option) };
+      return { ...acc, [modelName]: this.create(modelName, functionName ?? modelName, option) };
     }, {});
   }
 
@@ -65,25 +64,18 @@ export class PrismaCore {
     return this.create<ModelClient>(modelName, modelName, option);
   }
 
-  public create<ModelClient = PrismaFunctionInterface>(modelName: string, name: string, option?: ModelClient) {
+  public create<ModelClient = PrismaFunctionInterface>(modelName: string, functionName: string, option?: ModelClient) {
     const functionGroup = {
-      ...this.#find(modelName, option),
-      ...this.#create(modelName, option),
-      ...this.#delete(modelName, option),
-      ...this.#update(modelName, option),
+      ...this.#find(functionName, option),
+      ...this.#create(functionName, option),
+      ...this.#delete(functionName, option),
+      ...this.#update(functionName, option),
     } as PrismaFunctions;
 
-    if (modelName === name) {
-      this.functions = {
-        ...this.functions,
-        [name]: functionGroup,
-      };
-    } else {
-      this.customs = {
-        ...this.customs,
-        [name]: functionGroup,
-      };
-    }
+    this.functions = {
+      ...this.functions,
+      [modelName]: functionGroup,
+    };
 
     return functionGroup;
   }
@@ -175,7 +167,7 @@ export class PrismaCore {
           return await options.callback(req, res, next, options);
         }
 
-        const row = await (this.prisma as any)[(modelName as string).toLowerCase()].findUnique(options);
+        const row = await (this.prisma as any)[modelName].findUnique(options);
         if (!row) {
           throw { status: 404, message: `${modelName} 정보를 찾을 수 없습니다.` };
         }
@@ -194,7 +186,7 @@ export class PrismaCore {
           return await options.callback(req, res, next, options);
         }
 
-        const row = await (this.prisma as any)[(modelName as string).toLowerCase()].findFirst(options);
+        const row = await (this.prisma as any)[modelName].findFirst(options);
         if (!row) {
           throw { status: 404, message: `${modelName} 정보를 찾을 수 없습니다.` };
         }
@@ -220,8 +212,8 @@ export class PrismaCore {
         }
 
         const [count, rows] = await Promise.all([
-          (this.prisma as any)[(modelName as string).toLowerCase()].count({ where: options?.where ?? {} }),
-          (this.prisma as any)[(modelName as string).toLowerCase()].findMany(options),
+          (this.prisma as any)[modelName].count({ where: options?.where ?? {} }),
+          (this.prisma as any)[modelName].findMany(options),
         ]);
 
         res.status(200).json({ count, rows });
@@ -242,7 +234,7 @@ export class PrismaCore {
           return await options.callback(req, res, next, options);
         }
 
-        const row = await (this.prisma as any)[(modelName as string).toLowerCase()].create(options);
+        const row = await (this.prisma as any)[modelName].create(options);
 
         res.status(200).json({ row });
       } catch (error) {
@@ -258,7 +250,7 @@ export class PrismaCore {
           return await options.callback(req, res, next, options);
         }
 
-        const rows = await (this.prisma as any)[(modelName as string).toLowerCase()].createMany(options);
+        const rows = await (this.prisma as any)[modelName].createMany(options);
 
         res.status(200).json({ rows });
       } catch (error) {
@@ -278,7 +270,7 @@ export class PrismaCore {
           return await options.callback(req, res, next, options);
         }
 
-        const row = await (this.prisma as any)[(modelName as string).toLowerCase()].delete(options);
+        const row = await (this.prisma as any)[modelName].delete(options);
 
         res.status(200).json({ row });
       } catch (error) {
@@ -294,7 +286,7 @@ export class PrismaCore {
           return await options.callback(req, res, next, options);
         }
 
-        const rows = await (this.prisma as any)[(modelName as string).toLowerCase()].deleteMany(options);
+        const rows = await (this.prisma as any)[modelName].deleteMany(options);
 
         res.status(200).json({ rows });
       } catch (error) {
@@ -314,12 +306,12 @@ export class PrismaCore {
           return await options.callback(req, res, next, options);
         }
 
-        const row = await (this.prisma as any)[(modelName as string).toLowerCase()].findFirst({ where: options.where });
+        const row = await (this.prisma as any)[modelName].findFirst({ where: options.where });
         if (!row) {
           throw { status: 404, message: `${modelName} 정보를 찾을 수 없습니다.` };
         }
 
-        await (this.prisma as any)[(modelName as string).toLowerCase()].update(options);
+        await (this.prisma as any)[modelName].update(options);
 
         res.status(204).end();
       } catch (error) {
@@ -335,7 +327,7 @@ export class PrismaCore {
           return await options.callback(req, res, next, options);
         }
 
-        const rows = await (this.prisma as any)[(modelName as string).toLowerCase()].updateMany(options);
+        const rows = await (this.prisma as any)[modelName].updateMany(options);
 
         res.status(200).json({ rows });
       } catch (error) {
