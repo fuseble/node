@@ -25,7 +25,7 @@ export type PrismaCallback = (req: Request, res: Response, next: NextFunction, o
 export type PrismaArgsWithCallback<T> = T & { callback?: PrismaCallback };
 
 export type PrismaFunctionInterfaces = {
-  [key: string]: PrismaFunctionInterface | string;
+  [key: string]: PrismaFunctionInterface | any;
   function?: string;
 };
 
@@ -109,7 +109,14 @@ export class PrismaCore {
     }
   }
 
-  #parse(value: string, type?: string) {
+  #parse(value: any, type?: string) {
+    if (typeof value === 'boolean') {
+      return value;
+    }
+    if (typeof value === 'number') {
+      return value;
+    }
+
     switch (type) {
       case 'string':
         return value;
@@ -134,7 +141,7 @@ export class PrismaCore {
 
     Object.entries(options).forEach(([_optionKey, _optionValue]) => {
       Object.entries(request).forEach(([_requestKey, _requestValue]) => {
-        if (typeof _optionValue === 'string' && _optionValue.includes('$')) {
+        if (typeof _optionValue === 'string' && _optionValue.startsWith(`$${_requestKey}`)) {
           let optionKey = _optionValue.replace('$', '');
           let dataType = 'auto';
 
