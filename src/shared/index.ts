@@ -11,3 +11,4 @@ export * from './location';
 export * from './qrcode';
 export * from './sharp';
 export * from './aws';
+export * from './smartDelivery';

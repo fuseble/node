@@ -3,7 +3,6 @@ import axios, { AxiosRequestHeaders } from 'axios';
 import queryString from 'query-string';
 
 import type {
-  ILocation,
   IKakaoAddress,
   IKakaoKeyword,
   KakaoAddressResponse,
@@ -15,6 +14,7 @@ import type {
   GoogleGeocodeResponse,
   DistanceProps,
 } from './type';
+import { LocationProps } from './type';
 
 const kakaoApi = axios.create({
   baseURL: 'https://dapi.kakao.com/v2/local',
@@ -29,7 +29,7 @@ class Location {
   private googleRestKey: string | undefined;
   private headers: AxiosRequestHeaders | null = null;
 
-  constructor({ kakaoRestKey, googleRestKey }: ILocation) {
+  constructor({ kakaoRestKey, googleRestKey }: LocationProps) {
     this.kakaoRestKey = kakaoRestKey;
     this.googleRestKey = googleRestKey;
   }
