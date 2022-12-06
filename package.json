@@ -43,6 +43,7 @@
     "qrcode": "^1.5.0",
     "query-string": "^7.1.1",
     "redis": "^4.0.4",
+    "sendbird": "^3.1.29",
     "sharp": "^0.30.1",
     "socket.io": "^4.4.1",
     "socket.io-redis": "^6.1.1",
