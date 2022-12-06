@@ -7,14 +7,6 @@ interface SendMessageProps {
 }
 
 type SendMessagesProps = Array<SendMessageProps>;
-
-type SendMessageResponse = boolean;
-
-type SendMessagesResponse = {
-  success: SendMessageProps[];
-  failure: SendMessageProps[];
-};
-
 export class FirebaseMessaging {
   private app: admin.app.App;
 
@@ -24,33 +16,14 @@ export class FirebaseMessaging {
     });
   }
 
-  async sendMessage({ token, notification }: SendMessageProps): Promise<SendMessageResponse> {
-    try {
-      await this.app.messaging().send({
-        token,
-        notification,
-      });
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }
+  public sendMessage = async ({ token, notification }: SendMessageProps) => {
+    return await this.app.messaging().send({
+      token,
+      notification,
+    });
+  };
 
-  async sendMessages(messages: SendMessagesProps): Promise<SendMessagesResponse> {
-    const result: SendMessagesResponse = { success: [], failure: [] };
-    for await (const message of messages) {
-      const messageResult = await this.sendMessage({
-        token: message.token,
-        notification: message.notification as Notification,
-      });
-
-      if (messageResult) {
-        result.success.push(message);
-      } else {
-        result.failure.push(message);
-      }
-    }
-
-    return result;
-  }
+  public sendMessages = async (messages: SendMessagesProps) => {
+    return await Promise.all(messages.map(message => this.sendMessage(message)));
+  };
 }
