@@ -1,7 +1,6 @@
 import Express, { Application } from 'express';
 import fs from 'fs';
-
-import { createOpenAPI, OpenAPIOptions } from '../../shared';
+import { createOpenAPI, OpenAPIOptions } from '../../openapi';
 import { json, urlencoded, cors, jsonwebtoken, pagination, swagger } from '../middlewares';
 
 import { createRouter, errorController, globalController, IErrorProps, IGlobalProps, ExpressController } from '.';

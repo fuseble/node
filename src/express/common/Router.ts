@@ -1,5 +1,5 @@
 import type { Application } from 'express';
-import type { ControllerAPI, ControllerAPIMethodLowerCase } from '../../shared';
+import type { ControllerAPI, ControllerAPIMethodLowerCase } from '../../openapi';
 
 export const createRouter = (app: Application, controllers: Record<string, any>, validators: any) => {
   Object.entries(controllers).forEach(([key, value]: [string, any]) => {

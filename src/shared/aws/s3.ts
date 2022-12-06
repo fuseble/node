@@ -1,7 +1,9 @@
+import { type Request } from 'express';
 import { S3Client, DeleteObjectCommand, type S3ClientConfig, GetObjectCommand } from '@aws-sdk/client-s3';
+import { Readable } from 'stream';
+import { lookup } from 'mime-types';
 import multer from 'multer';
 import multerS3 from 'multer-s3';
-import { Readable } from 'stream';
 
 export interface MulterFile {
   fieldname: string;
@@ -32,6 +34,8 @@ export class AwsS3 {
   private options: S3ClientConfig;
   public upload: multer.Multer;
 
+  public imageUpload: multer.Multer;
+
   constructor(bucket: string, options: S3ClientConfig, requiredUser = false) {
     this.bucket = bucket;
     this.options = options;
@@ -57,10 +61,40 @@ export class AwsS3 {
         acl: 'public-read',
       }),
     });
+
+    this.imageUpload = multer({
+      storage: multerS3({
+        s3: this.s3,
+        bucket: this.bucket,
+        key: function (req, file: MulterFile, cb) {
+          if (requiredUser && !req.user) {
+            return cb({ status: 401, message: 'NotFound user!' });
+          }
+
+          const keys = [req.user.id, `${Date.now().toString()}-${file.originalname}`];
+          if (typeof (req as any)?.query?.folder === 'string') {
+            keys[1] = `${(req as any).query.folder}/${req.user.id}`;
+          }
+
+          return cb(null, keys.join('/'));
+        },
+        acl: 'public-read',
+      }),
+      fileFilter(req: Request, file: Express.Multer.File, callback: multer.FileFilterCallback) {
+        const isImage = AwsS3.getContentType(file.originalname).startsWith('image');
+        callback(null, isImage);
+      },
+    });
   }
+
+  public static getContentType = (filename: string) => lookup(filename) || 'application/octet-stream';
 
   public single = (fieldName: string) => this.upload.single(fieldName);
   public array = (fieldName: string) => this.upload.array(fieldName);
+
+  public imageSingle = (fieldName: string) => this.imageUpload.single(fieldName);
+
+  public imageArray = (fieldName: string) => this.imageUpload.array(fieldName);
 
   public getObject = (Key: string) => this.s3.send(new GetObjectCommand({ Bucket: this.bucket, Key }));
 
