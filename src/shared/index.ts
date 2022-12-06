@@ -1,5 +1,4 @@
 export * from './aligo';
-export * from './axios';
 export * from './encrypt';
 export * from './env';
 export * from './firebase';
