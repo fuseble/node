@@ -11,6 +11,7 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
     },
   };
 
+  // Response 있을 경우
   if (Array.isArray(api.responses)) {
     api.responses.forEach((item: ControllerAPIResponse) => {
       if (typeof item === 'number') {
@@ -27,7 +28,6 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
           message = OPEN_API_RESPONSES[item.status],
           exampleContentType = 'application/json',
           example = {},
-          schema,
         } = item;
         const content: any = { [exampleContentType]: {} };
 
@@ -41,12 +41,64 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
         };
       }
     });
-  } else {
+  } else if (!Array.isArray(api.responses) && api.schema) {
+    if (api.method === 'GET') {
+      responses[200] = {
+        description: `${OPEN_API_RESPONSES[200]} ${api.schema} 성공`,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                row: {
+                  $ref: '#/components/schemas/' + api.schema,
+                },
+                rows: {
+                  type: 'array',
+                  items: {
+                    $ref: '#/components/schemas/' + api.schema,
+                  },
+                },
+              },
+            },
+          },
+        },
+      };
+    } else if (api.method === 'POST') {
+      responses[201] = {
+        description: `${OPEN_API_RESPONSES[201]} ${api.schema} 성공`,
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                row: {
+                  $ref: '#/components/schemas/' + api.schema,
+                },
+              },
+            },
+          },
+        },
+      };
+    }
+  } else if (api.method === 'GET') {
     responses[200] = {
       description: OPEN_API_RESPONSES[200],
       content: {
         'application/json': {},
       },
+    };
+  } else if (api.method === 'POST') {
+    responses[201] = {
+      description: OPEN_API_RESPONSES[201],
+      content: {
+        'application/json': {},
+      },
+    };
+  } else if (api.method === 'DELETE' || api.method === 'PATCH' || api.method === 'PUT') {
+    responses[204] = {
+      desciption: OPEN_API_RESPONSES[204],
+      content: 'No Response',
     };
   }
 

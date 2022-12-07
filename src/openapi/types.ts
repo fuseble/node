@@ -66,6 +66,7 @@ export type ControllerAPI<P = any, Q = any, B = any> = {
   description?: string;
   formData?: { key: string; type: 'single' | 'multiple' };
   responses?: ControllerAPIResponses;
+  schema?: string;
 };
 
 // OpenAPI
