@@ -47,6 +47,10 @@ export class App {
     }
   }
 
+  public listen(port: number, callback?: () => void) {
+    this.app.listen(port, callback);
+  }
+
   public async init() {
     if (this.openAPI) {
       const openAPI = await createOpenAPI({
