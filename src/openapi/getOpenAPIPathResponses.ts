@@ -43,27 +43,44 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
     });
   } else if (!Array.isArray(api.responses) && api.schema) {
     if (api.method === 'GET') {
-      responses[200] = {
-        description: `${OPEN_API_RESPONSES[200]} ${api.schema} 성공`,
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                row: {
-                  $ref: '#/components/schemas/' + api.schema,
+      if (api.schema.includes('[]')) {
+        api.schema = api.schema.replace('[]', '');
+
+        responses[200] = {
+          description: `${OPEN_API_RESPONSES[200]} ${api.schema} 성공`,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  rows: {
+                    type: 'array',
+                    items: {
+                      $ref: '#/components/schemas/' + api.schema,
+                    },
+                  },
                 },
-                rows: {
-                  type: 'array',
-                  items: {
+              },
+            },
+          },
+        };
+      } else {
+        responses[200] = {
+          description: `${OPEN_API_RESPONSES[200]} ${api.schema} 성공`,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  row: {
                     $ref: '#/components/schemas/' + api.schema,
                   },
                 },
               },
             },
           },
-        },
-      };
+        };
+      }
     } else if (api.method === 'POST') {
       responses[201] = {
         description: `${OPEN_API_RESPONSES[201]} ${api.schema} 성공`,
