@@ -97,6 +97,11 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
           },
         },
       };
+    } else {
+      responses[204] = {
+        description: `${OPEN_API_RESPONSES[204]} ${api.schema} 성공`,
+        content: { 'application/json': {} },
+      };
     }
   } else if (api.method === 'GET') {
     responses[200] = {

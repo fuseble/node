@@ -20,6 +20,7 @@ type InitAppOpenAPI = {
 
 export interface InitAppProps {
   controllers: Record<string, any>;
+  authControllers: Record<string, ExpressController>;
   modelMap?: Record<string, any>;
   enums?: Record<string, any>;
   openAPI?: InitAppOpenAPI;
@@ -28,6 +29,7 @@ export interface InitAppProps {
 export class App {
   public app: Application;
   private controllers: any;
+  private authControllers?: Record<string, ExpressController>;
   private modelMap?: any;
   private enums?: any;
   private openAPI?: InitAppOpenAPI;
@@ -35,6 +37,7 @@ export class App {
   constructor(props: InitAppProps) {
     this.app = Express();
     this.controllers = props?.controllers;
+    this.authControllers = props?.authControllers;
     this.modelMap = props?.modelMap;
     this.enums = props?.enums;
 
@@ -106,8 +109,12 @@ export class App {
   }
 
   public routers(options?: { errorOptions?: IErrorProps; globalOptions?: IGlobalProps }) {
-    const validator = Validator.create(this.controllers);
-    createRouter(this.app, this.controllers, validator);
+    createRouter({
+      app: this.app,
+      controllers: this.controllers,
+      authControllers: this.authControllers,
+      validators: Validator.create(this.controllers),
+    });
 
     this.app.use(errorController(options?.errorOptions));
     this.app.use(globalController(options?.globalOptions));

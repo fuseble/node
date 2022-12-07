@@ -62,6 +62,7 @@ export type ControllerAPI<P = any, Q = any, B = any> = {
   header?: ValidatorItem[];
   body?: ValidatorItem[];
   auth?: 'jwt' | 'cookie' | 'session';
+  authorize?: 'user' | 'admin' | 'super' | string;
   summary?: string;
   description?: string;
   formData?: { key: string; type: 'single' | 'multiple' };
