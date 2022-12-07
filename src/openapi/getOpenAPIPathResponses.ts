@@ -93,7 +93,7 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
     };
   } else if (api.method === 'DELETE' || api.method === 'PATCH' || api.method === 'PUT') {
     responses[204] = {
-      desciption: OPEN_API_RESPONSES[204],
+      description: OPEN_API_RESPONSES[204],
       content: { 'application/json': {} },
     };
   }
