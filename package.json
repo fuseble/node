@@ -1,6 +1,6 @@
 {
   "name": "@fuseble.inc/node",
-  "version": "1.4.11",
+  "version": "1.4.12",
   "main": "build/index.js",
   "bin": "build/express/sdk/index.js",
   "repository": "https://github.com/outqource/outqource-node",
