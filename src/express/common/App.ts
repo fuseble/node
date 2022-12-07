@@ -1,7 +1,7 @@
 import Express, { Application } from 'express';
 import fs from 'fs';
 import { createOpenAPI, OpenAPIOptions } from '../../openapi';
-import { json, urlencoded, cors, jsonwebtoken, pagination, swagger } from '../middlewares';
+import { json, urlencoded, cors, pagination, swagger } from '../middlewares';
 
 import { createRouter, errorController, globalController, IErrorProps, IGlobalProps, ExpressController } from '.';
 import Validator from '../validator';
@@ -20,17 +20,23 @@ type InitAppOpenAPI = {
 
 export interface InitAppProps {
   controllers: Record<string, any>;
+  modelMap?: Record<string, any>;
+  enums?: Record<string, any>;
   openAPI?: InitAppOpenAPI;
 }
 
-export class InitApp {
+export class App {
   public app: Application;
   private controllers: any;
+  private modelMap?: any;
+  private enums?: any;
   private openAPI?: InitAppOpenAPI;
 
   constructor(props: InitAppProps) {
     this.app = Express();
     this.controllers = props?.controllers;
+    this.modelMap = props?.modelMap;
+    this.enums = props?.enums;
 
     if (props.openAPI?.path) {
       this.openAPI = {
@@ -43,7 +49,12 @@ export class InitApp {
 
   public async init() {
     if (this.openAPI) {
-      const openAPI = await createOpenAPI(this.openAPI.options as OpenAPIOptions, this.controllers);
+      const openAPI = await createOpenAPI({
+        ...(this.openAPI.options as OpenAPIOptions),
+        controllers: this.controllers,
+        modelMap: this.modelMap,
+        enums: this.enums,
+      });
       await fs.writeFileSync(this.openAPI.path, openAPI);
     }
   }
@@ -62,11 +73,9 @@ export class InitApp {
     middlewares?: ExpressController[] | { before?: ExpressController[]; after?: ExpressController[] },
     props?: {
       corsOptions?: cors.CorsOptions;
-      jwtUserCallback?: (accessToken: string) => Promise<any>;
     },
   ) {
     const corsOptions = props?.corsOptions;
-    const jwtUserCallback = props?.jwtUserCallback;
 
     // default
     this.app.use(cors(corsOptions));
@@ -77,10 +86,6 @@ export class InitApp {
 
     if (!Array.isArray(middlewares) && middlewares?.before) {
       this.applyMiddlewares(middlewares.before);
-    }
-
-    if (jwtUserCallback) {
-      this.app.use(jsonwebtoken(jwtUserCallback));
     }
 
     if (this.openAPI) {
@@ -106,3 +111,5 @@ export class InitApp {
     this.app.get('/healthy', (req, res) => res.status(200).send('Health Check'));
   }
 }
+
+export const ExpressApp = App;

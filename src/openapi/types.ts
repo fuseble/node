@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { URL } from 'url';
 
+export { DMMF } from '@prisma/client/runtime';
+
+export type Dictionary<T> = Record<string, T>;
+
 export type OpenAPIOptions = {
   title: string;
   version: string;

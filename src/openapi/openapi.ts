@@ -9,6 +9,13 @@ import getOpenAPIPathSecurity from './getOpenAPIPathSecurity';
 import getOpenAPIPathParameters from './getOpenAPIPathParameters';
 import getOpenAPIPathRequestBody from './getOpenAPIPathRequestBody';
 import getOpenAPIPathResponses from './getOpenAPIPathResponses';
+import getOpenAPISchemas from './getOpenAPISchemas';
+
+export interface CreateOpenAPIOptions extends OpenAPIOptions {
+  controllers: any;
+  modelMap?: any;
+  enums?: any;
+}
 
 const getOpenAPIPaths = async (controllers: Record<string, any>) => {
   const paths: any = {};
@@ -44,10 +51,18 @@ const getOpenAPIPaths = async (controllers: Record<string, any>) => {
   return paths;
 };
 
-const createOpenAPI = async ({ title, version, urls }: OpenAPIOptions, controllers: any): Promise<string> => {
+const createOpenAPI = async ({
+  title,
+  version,
+  urls,
+  controllers,
+  modelMap,
+  enums,
+}: CreateOpenAPIOptions): Promise<string> => {
   const tags = getOpenAPITags(controllers);
+  const schemas = getOpenAPISchemas(modelMap, enums);
   const paths = await getOpenAPIPaths(controllers);
-  const result = getOpenAPI({ title, version, urls, tags, paths });
+  const result = getOpenAPI({ title, version, urls, tags, paths, schemas });
 
   return JSON.stringify(result);
 };

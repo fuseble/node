@@ -2,9 +2,10 @@ import { OpenAPI3, OpenAPIOptions } from './types';
 interface GetOpenAPIProps extends OpenAPIOptions {
   tags: any[];
   paths: any;
+  schemas?: any;
 }
 
-const getOpenAPI = ({ title, version, urls, tags, paths }: GetOpenAPIProps): OpenAPI3 => ({
+const getOpenAPI = ({ title, version, urls, tags, paths, schemas }: GetOpenAPIProps): OpenAPI3 => ({
   openapi: '3.0.0',
   info: {
     title,
@@ -19,6 +20,7 @@ const getOpenAPI = ({ title, version, urls, tags, paths }: GetOpenAPIProps): Ope
         bearerFormat: 'JWT',
       },
     },
+    schemas: schemas || {},
   },
   tags,
   paths,
