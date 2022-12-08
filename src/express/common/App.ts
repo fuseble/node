@@ -1,10 +1,12 @@
-import Express, { Application } from 'express';
+import express, { Application } from 'express';
+import * as bodyParser from 'body-parser';
 import fs from 'fs';
 import { createOpenAPI, OpenAPIOptions } from '../../openapi';
 import { json, urlencoded, cors, pagination, swagger } from '../middlewares';
 
 import { createRouter, errorController, globalController, IErrorProps, IGlobalProps, ExpressController } from '.';
 import Validator from '../validator';
+import exp from 'constants';
 
 const defaultOpenAPIOptions: OpenAPIOptions = {
   title: 'outqource-node/express',
@@ -35,7 +37,7 @@ export class App {
   private openAPI?: InitAppOpenAPI;
 
   constructor(props: InitAppProps) {
-    this.app = Express();
+    this.app = express();
     this.controllers = props?.controllers;
     this.authControllers = props?.authControllers;
     this.modelMap = props?.modelMap;
@@ -79,21 +81,16 @@ export class App {
   public middlewares(
     middlewares?: ExpressController[] | { before?: ExpressController[]; after?: ExpressController[] },
     props?: {
-      corsOptions?: cors.CorsOptions;
+      corsOption?: cors.CorsOptions;
+      jsonOption?: bodyParser.Options;
+      urlencodedOption?: bodyParser.OptionsUrlencoded;
     },
   ) {
-    const corsOptions = props?.corsOptions;
-
-    // default
-    this.app.use(cors(corsOptions));
-    this.app.use(json({}));
-    this.app.use(urlencoded({ extended: true }));
-    this.app.use(Express.static('public'));
+    this.app.use(cors(props?.corsOption ?? {}));
+    this.app.use(json(props?.jsonOption ?? {}));
+    this.app.use(urlencoded(props?.urlencodedOption ?? { extended: true }));
+    this.app.use(express.static('public'));
     this.app.use(pagination());
-
-    if (!Array.isArray(middlewares) && middlewares?.before) {
-      this.applyMiddlewares(middlewares.before);
-    }
 
     if (this.openAPI) {
       this.app.use(this.openAPI.endPoint as string, ...swagger(this.openAPI.path));
@@ -101,10 +98,14 @@ export class App {
 
     if (Array.isArray(middlewares)) {
       this.applyMiddlewares(middlewares);
-    }
+    } else {
+      if (!Array.isArray(middlewares) && middlewares?.before) {
+        this.applyMiddlewares(middlewares.before);
+      }
 
-    if (!Array.isArray(middlewares) && middlewares?.after) {
-      this.applyMiddlewares(middlewares.after);
+      if (!Array.isArray(middlewares) && middlewares?.after) {
+        this.applyMiddlewares(middlewares.after);
+      }
     }
   }
 

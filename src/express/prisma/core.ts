@@ -22,7 +22,7 @@ export enum ModelAction {
 }
 export type PrismaCallback = (req: Request, res: Response, next: NextFunction, options: any) => any | Promise<any>;
 
-export type PrismaArgsWithCallback<T> = T & { callback?: PrismaCallback };
+export type PrismaArgsWithCallback<T> = Partial<T> & { callback?: PrismaCallback };
 
 export type PrismaFunctionInterfaces = {
   [key: string]: PrismaFunctionInterface | any;
