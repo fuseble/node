@@ -1,6 +1,6 @@
 import type { Application } from 'express';
-import type { ControllerAPI, ControllerAPIMethodLowerCase } from '../../openapi';
 import { ExpressController } from './index';
+import type { ControllerAPI, ControllerAPIMethodLowerCase } from '../../openapi';
 
 export interface CreateRouterProps {
   app: Application;
@@ -13,7 +13,6 @@ export const createRouter = ({ app, controllers, authControllers, validators }: 
   Object.entries(controllers).forEach(([key, value]: [string, any]) => {
     if (key.includes('API')) {
       const api = value as ControllerAPI;
-
       const name = key.replace('API', '');
       const controller = controllers[name];
 
@@ -21,6 +20,7 @@ export const createRouter = ({ app, controllers, authControllers, validators }: 
       const method = api.method.toLowerCase() as ControllerAPIMethodLowerCase;
       const middlewares: ExpressController[] = [...(api.middlewares || []), ...(validators[name] || [])];
       if (api.authorize && authControllers?.[api.authorize]) {
+        if (!api.auth) api.auth = 'jwt';
         middlewares.unshift(authControllers[api.authorize] as ExpressController);
       }
 

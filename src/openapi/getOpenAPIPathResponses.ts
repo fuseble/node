@@ -41,7 +41,9 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
         };
       }
     });
-  } else if (!Array.isArray(api.responses) && api.schema) {
+  } else {
+    if (!api.schema) api.schema = (api.tags as string[])[0];
+
     if (api.method === 'GET') {
       if (api.schema.includes('[]')) {
         api.schema = api.schema.replace('[]', '');
@@ -103,21 +105,6 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
         content: { 'application/json': {} },
       };
     }
-  } else if (api.method === 'GET') {
-    responses[200] = {
-      description: OPEN_API_RESPONSES[200],
-      content: { 'application/json': {} },
-    };
-  } else if (api.method === 'POST') {
-    responses[201] = {
-      description: OPEN_API_RESPONSES[201],
-      content: { 'application/json': {} },
-    };
-  } else if (api.method === 'DELETE' || api.method === 'PATCH' || api.method === 'PUT') {
-    responses[204] = {
-      description: OPEN_API_RESPONSES[204],
-      content: { 'application/json': {} },
-    };
   }
 
   return responses;

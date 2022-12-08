@@ -73,7 +73,7 @@ const getOpenAPIPathRequestBody = (api: ControllerAPI) => {
       },
     };
   } else {
-    const example = getRequestBodyExample(api.body);
+    const example = getRequestBodyExample(api.body as ValidatorItem[]);
 
     const requestBody = {
       content: {

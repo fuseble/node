@@ -5,13 +5,13 @@ const getOpenAPIPathSummary = (api: ControllerAPI, name: string) => {
     return `${api.summary} [${name}]`;
   }
 
-  let summary = '[API]';
+  let summary = '[API] ';
   if (api.path.startsWith('/admin') || api.path.startsWith('/api/admin')) {
-    summary = '[ADMIN]';
+    summary = '[ADMIN] ';
   }
 
   if (api.schema) {
-    summary += api.schema;
+    summary += api.schema.includes('[]') ? api.schema.replace('[]', '') : api.schema;
   } else if (api.tags) {
     summary += api.tags[0];
   } else {

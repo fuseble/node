@@ -1,6 +1,5 @@
 import type { OpenAPIOptions, ControllerAPI } from './types';
 
-import SDKGenerator from '../sdk';
 import getOpenAPI from './getOpenAPI';
 import getOpenAPITags from './getOpenAPITags';
 import getOpenAPIPath from './getOpenAPIPath';
@@ -19,7 +18,6 @@ export interface CreateOpenAPIOptions extends OpenAPIOptions {
 
 const getOpenAPIPaths = async (controllers: Record<string, any>) => {
   const paths: any = {};
-  const sdk = await new SDKGenerator(controllers).writeSDKs();
 
   Object.entries(controllers).forEach(([key, value]: [string, any]) => {
     if (key.includes('API')) {

@@ -20,7 +20,7 @@ type InitAppOpenAPI = {
 
 export interface InitAppProps {
   controllers: Record<string, any>;
-  authControllers: Record<string, ExpressController>;
+  authControllers?: Record<string, ExpressController>;
   modelMap?: Record<string, any>;
   enums?: Record<string, any>;
   openAPI?: InitAppOpenAPI;

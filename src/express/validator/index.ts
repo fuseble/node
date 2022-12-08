@@ -60,7 +60,7 @@ export default class Validator {
         const controllerAPI = value as ControllerAPI;
 
         Object.entries(value).forEach(([key, value]: [string, any]) => {
-          if (key === 'params' || key === 'query' || key === 'body') {
+          if (key === 'params' || key === 'query' || (key === 'body' && value)) {
             apiValidators[key] = this.createValidators(value as ValidatorItem[]);
           }
         });
@@ -179,7 +179,9 @@ export default class Validator {
       let errorMessage = '';
 
       if (req.params && validators.params) {
-        const validation = validators.params(Validator.#parse(req.params, controllerAPI.params ?? []));
+        const validation = validators.params(
+          Validator.#parse(req.params, (controllerAPI.params as ValidatorItem[]) ?? []),
+        );
         errorMessage = this.getErrorMessage(validators.params.errors) ?? '';
 
         if (!validation) {
@@ -191,7 +193,9 @@ export default class Validator {
       }
 
       if (req.query && validators.query) {
-        const validation = validators.query(Validator.#parse(req.query, controllerAPI.query ?? []));
+        const validation = validators.query(
+          Validator.#parse(req.query, (controllerAPI.query as ValidatorItem[]) ?? []),
+        );
         errorMessage = this.getErrorMessage(validators.query.errors) ?? '';
 
         if (!validation) {
@@ -203,7 +207,7 @@ export default class Validator {
       }
 
       if (req.body && validators.body) {
-        const validation = validators.body(Validator.#parse(req.body, controllerAPI.body ?? []));
+        const validation = validators.body(Validator.#parse(req.body, (controllerAPI.body as ValidatorItem[]) ?? []));
         errorMessage = this.getErrorMessage(validators.body.errors) ?? '';
 
         if (!validation) {

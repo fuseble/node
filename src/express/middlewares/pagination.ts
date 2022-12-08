@@ -5,6 +5,7 @@ declare global {
     interface Request {
       take?: number;
       skip?: number;
+      pagination: ({ count, rows }: any) => any;
     }
   }
 }
@@ -19,6 +20,17 @@ const pagination = () => {
 
     req.take = take;
     req.skip = skip;
+    req.pagination = ({ count, rows }) => {
+      return {
+        count,
+        rows,
+        page: Number(page),
+        limit: Number(limit),
+        totalPages: Math.ceil(count / take),
+        hasPrev: Number(page) > 1,
+        hasNext: Number(page) < Math.ceil(count / take),
+      };
+    };
 
     next();
   };
