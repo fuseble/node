@@ -1,36 +1,41 @@
-import Client from 'sendbird';
-import axios, { AxiosInstance } from 'axios';
+import SendbirdPlatformSdk from 'sendbird-platform-sdk';
+import type { SendBirdUserList, SendBirdChannel, SendBirdUser } from './types';
 
 export default class SendBird {
-  private app_id: string;
-  private baseURL: string;
-  private sb: Client.SendBirdInstance;
-
-  private apiClient: AxiosInstance;
-
-  constructor(app_id: string, api_token: string) {
-    this.app_id = app_id;
-    this.baseURL = `https://api-${this.app_id}.sendbird.com/v3`;
-    this.sb = new Client({ appId: this.app_id });
-
-    this.apiClient = axios.create({
-      baseURL: this.baseURL,
-      headers: {
-        'Api-Token': api_token,
-        'Content-Type': 'application/json; charset=utf8',
-      },
-    });
+  private apiToken: string;
+  private userApi = new SendbirdPlatformSdk.UserApi();
+  private groupChannelApi = new SendbirdPlatformSdk.GroupChannelApi();
+  constructor(apiToken: string) {
+    this.apiToken = apiToken;
   }
 
-  public connect = async (userId: string) => {
-    return await new Promise((resolve, reject) => {
-      this.sb.connect(userId, (user, error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(user);
-        }
-      });
-    });
-  };
+  public getUserList = async (data?: any): Promise<SendBirdUserList> =>
+    await this.userApi.listUsers(this.apiToken, data ?? {});
+
+  public getUserById = async (userIds: string | string[]): Promise<SendBirdUserList> =>
+    await this.userApi.listUsers(this.apiToken, { userIds });
+
+  public getUserByNickname = async (nickname: string): Promise<SendBirdUserList> =>
+    await this.userApi.listUsers(this.apiToken, { nickname });
+
+  public createUser = async (data: any): Promise<SendBirdUser> => await this.userApi.createUser(this.apiToken, data);
+
+  public getChannels = async () => await this.groupChannelApi.gcListChannels(this.apiToken, {});
+
+  public getChannelsByName = async (name: string) => await this.groupChannelApi.gcListChannels(this.apiToken, { name });
+
+  public getChannelsByUserId = async (userIds: string | string[]) =>
+    await this.groupChannelApi.gcListChannels(this.apiToken, { userIds });
+
+  public getChannelMembers = async (channelUrl: string) =>
+    await this.groupChannelApi.gcListMembers(this.apiToken, channelUrl, {});
+
+  public inviteChannel = async (chnnaleUrl: string, userIds: string | string[]) =>
+    await this.groupChannelApi.gcInviteAsMembers(this.apiToken, chnnaleUrl, { userIds });
+
+  public joinChannel = async (channelUrl: string) =>
+    await this.groupChannelApi.gcJoinChannel(this.apiToken, channelUrl);
+
+  public leaveChannel = async (channelUrl: string) =>
+    await this.groupChannelApi.gcLeaveChannel(this.apiToken, channelUrl, {});
 }
