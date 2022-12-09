@@ -36,7 +36,11 @@ export class AwsS3 {
 
   public imageUpload: multer.Multer;
 
-  constructor(bucket: string, options: S3ClientConfig, requiredUser = false) {
+  constructor(
+    bucket: string,
+    options: S3ClientConfig,
+    key: (req: Express.Request, file: Express.Multer.File, callback: (error: any, key?: string) => void) => void,
+  ) {
     this.bucket = bucket;
     this.options = options;
 
@@ -46,19 +50,7 @@ export class AwsS3 {
       storage: multerS3({
         s3: this.s3,
         bucket: this.bucket,
-        key: function (req, file: MulterFile, cb) {
-          if (requiredUser && !req.user) {
-            return cb({ status: 401, message: 'NotFound user!' });
-          }
-
-          const keys = [req.user.id, `${Date.now().toString()}-${file.originalname}`];
-          if (typeof (req as any)?.query?.folder === 'string') {
-            keys[1] = `${(req as any).query.folder}/${req.user.id}`;
-          }
-
-          return cb(null, keys.join('/'));
-        },
-        acl: 'public-read',
+        key,
       }),
     });
 
@@ -66,19 +58,7 @@ export class AwsS3 {
       storage: multerS3({
         s3: this.s3,
         bucket: this.bucket,
-        key: function (req, file: MulterFile, cb) {
-          if (requiredUser && !req.user) {
-            return cb({ status: 401, message: 'NotFound user!' });
-          }
-
-          const keys = [req.user.id, `${Date.now().toString()}-${file.originalname}`];
-          if (typeof (req as any)?.query?.folder === 'string') {
-            keys[1] = `${(req as any).query.folder}/${req.user.id}`;
-          }
-
-          return cb(null, keys.join('/'));
-        },
-        acl: 'public-read',
+        key,
       }),
       fileFilter(req: Request, file: Express.Multer.File, callback: multer.FileFilterCallback) {
         const isImage = AwsS3.getContentType(file.originalname).startsWith('image');
