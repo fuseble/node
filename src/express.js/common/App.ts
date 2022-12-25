@@ -2,9 +2,7 @@ import express, { Application } from 'express';
 import * as bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
-import { createOpenAPI, OpenAPIOptions } from '../../openapi';
-import Validator from '../validator';
-import { json, urlencoded, cors, pagination } from '../middlewares';
+import { createOpenAPI, OpenAPIOptions, Validator, json, urlencoded, cors, pagination } from '../../';
 import { createRouter, errorController, globalController, IErrorProps, IGlobalProps, ExpressController } from './index';
 
 const defaultOpenAPIOptions: OpenAPIOptions = {
@@ -92,6 +90,7 @@ export class App {
     this.app.use(pagination());
 
     if (this.openAPI) {
+      const document = require(this.openAPI.path);
       this.app.use(this.openAPI.endPoint as string, swaggerUi.serve as any, swaggerUi.setup(document) as any);
       this.app.get('/api-json', (req, res) => res.contentType('application/json').send(require(this.openAPI!.path)));
     }
@@ -119,8 +118,6 @@ export class App {
 
     this.app.use(errorController(options?.errorOptions));
     this.app.use(globalController(options?.globalOptions));
-
-    this.app.get('/healthy', (req, res) => res.status(200).send('Health Check'));
   }
 }
 

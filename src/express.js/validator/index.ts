@@ -20,7 +20,7 @@ export type ValidatorMiddleware<P, Q, B> = {
   body?: ValidateFunction<B>;
 };
 
-export default class Validator {
+export class Validator {
   readonly controllers: Record<string, any> = {};
 
   public validators: Record<string, any> = {};
