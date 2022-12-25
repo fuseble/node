@@ -1,19 +1,16 @@
 {
   "name": "@fuseble.inc/node",
-  "version": "1.5.2",
+  "version": "1.6.3",
   "main": "build/index.js",
-  "bin": "build/express/sdk/index.js",
-  "repository": "https://github.com/outqource/outqource-node",
-  "author": "AlpoxDev <contact@alpox.dev>",
+  "repository": "https://github.com/fuseble/node",
+  "author": "AlpoxDev <contact@fuseble.com>",
   "license": "MIT",
   "scripts": {
     "clear": "rm -rf build",
-    "build": "yarn clear && tsc -b",
-    "start": "nodemon --config nodemon.json",
+    "build": "yarn clear && tsc -p tsconfig.json",
     "prepublishOnly": "yarn build",
     "prepare": "husky install",
-    "lint:staged": "lint-staged",
-    "test-sdk": "node --trace-warnings --unhandled-rejections=strict build/express/sdk/index.js ./src/example/controllers ./test-sdk"
+    "lint:staged": "lint-staged"
   },
   "dependencies": {
     "@prisma/client": "^3.10.0",
@@ -41,7 +38,7 @@
     "query-string": "^7.1.1",
     "sendbird-platform-sdk": "^0.0.16",
     "sharp": "^0.31.2",
-    "swagger-ui-express": "^4.3.0",
+    "swagger-ui-express": "^4.6.0",
     "ts-node": "^10.8.2",
     "yup": "^0.32.11"
   },
@@ -50,7 +47,7 @@
     "@types/cors": "^2.8.13",
     "@types/crypto-js": "^4.1.1",
     "@types/dotenv": "^8.2.0",
-    "@types/express": "^4.17.13",
+    "@types/express": "^4.17.15",
     "@types/flat": "^5.0.2",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/lodash": "^4.14.179",

@@ -224,7 +224,7 @@ export class PrismaCore {
           (this.prisma as any)[modelName].findMany(options),
         ]);
 
-        res.status(200).json({ count, rows });
+        res.status(200).json(req.pagination({ count, rows }));
       } catch (error) {
         next(error);
       }

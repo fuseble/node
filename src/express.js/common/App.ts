@@ -1,15 +1,14 @@
 import express, { Application } from 'express';
 import * as bodyParser from 'body-parser';
+import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
 import { createOpenAPI, OpenAPIOptions } from '../../openapi';
-import { json, urlencoded, cors, pagination, swagger } from '../middlewares';
-
-import { createRouter, errorController, globalController, IErrorProps, IGlobalProps, ExpressController } from '.';
 import Validator from '../validator';
-import exp from 'constants';
+import { json, urlencoded, cors, pagination } from '../middlewares';
+import { createRouter, errorController, globalController, IErrorProps, IGlobalProps, ExpressController } from './index';
 
 const defaultOpenAPIOptions: OpenAPIOptions = {
-  title: 'outqource-node/express',
+  title: '@fuseble.inc/node',
   version: '1.0.0',
   urls: ['http://localhost:8000'],
 };
@@ -93,7 +92,8 @@ export class App {
     this.app.use(pagination());
 
     if (this.openAPI) {
-      this.app.use(this.openAPI.endPoint as string, ...swagger(this.openAPI.path));
+      this.app.use(this.openAPI.endPoint as string, swaggerUi.serve as any, swaggerUi.setup(document) as any);
+      this.app.get('/api-json', (req, res) => res.contentType('application/json').send(require(this.openAPI!.path)));
     }
 
     if (Array.isArray(middlewares)) {
@@ -119,7 +119,7 @@ export class App {
 
     this.app.use(errorController(options?.errorOptions));
     this.app.use(globalController(options?.globalOptions));
-    this.app.get('/', (req, res) => res.redirect(this.openAPI?.endPoint ?? '/api-docs'));
+
     this.app.get('/healthy', (req, res) => res.status(200).send('Health Check'));
   }
 }

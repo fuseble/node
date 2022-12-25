@@ -20,7 +20,7 @@ const pagination = () => {
 
     req.take = take;
     req.skip = skip;
-    req.pagination = ({ count, rows }) => {
+    req.pagination = ({ count, rows }: { count: number; rows: any[] }) => {
       return {
         count,
         rows,
