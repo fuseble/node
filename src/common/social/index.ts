@@ -8,11 +8,11 @@ import type { GoogleUser } from './google';
 import type { NaverUser } from './naver';
 import type { AppleUser } from './apple';
 
-class SocialLogin {
+export class SocialLogin {
   public Kakao = Kakao;
   public Google = Google;
   public Naver = Naver;
 }
 
-export { SocialLogin, Kakao, Google, Naver, Apple };
+export { Kakao, Google, Naver, Apple };
 export type { KakaoUser, GoogleUser, NaverUser, AppleUser };

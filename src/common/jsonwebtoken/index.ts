@@ -33,4 +33,12 @@ export class Jsonwebtoken {
       return error;
     }
   }
+
+  sign<T = any>(value: JwtPayload, options?: SignOptions): T | any {
+    return this.signJwt(value, options);
+  }
+
+  verify<T = any>(token: string, options?: VerifyOptions): T | any {
+    return this.verifyJwt(token, options);
+  }
 }

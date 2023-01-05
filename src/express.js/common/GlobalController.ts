@@ -10,7 +10,7 @@ export interface IGlobalProps {
 export const globalController = (props?: IGlobalProps) => {
   return (req: Request, res: Response, next: NextFunction) => {
     const html = props?.html || createGlobalHtml(props?.title);
-    const status = props?.status || 404;
+    const status = props?.status || 200;
 
     res.status(status).contentType('html').send(html);
   };
