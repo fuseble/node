@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import http from 'http';
 import * as bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
@@ -27,6 +28,8 @@ export interface InitAppProps {
 
 export class App {
   public app: Application;
+  public server: http.Server;
+
   private controllers: any;
   private authControllers?: Record<string, ExpressController>;
   private modelMap?: any;
@@ -35,6 +38,8 @@ export class App {
 
   constructor(props: InitAppProps) {
     this.app = express();
+    this.server = http.createServer(this.app);
+
     this.controllers = props?.controllers;
     this.authControllers = props?.authControllers;
     this.modelMap = props?.modelMap;
@@ -49,8 +54,17 @@ export class App {
     }
   }
 
-  public listen(port: number, callback?: () => void) {
-    this.app.listen(port, callback);
+  public listen(
+    port: number,
+    props?: {
+      callback?: () => void;
+      keepAliveTimeout?: number;
+      headersTimeout?: number;
+    },
+  ) {
+    this.server.listen(port, props?.callback);
+    this.server.keepAliveTimeout = props?.keepAliveTimeout ?? 90 * 1000;
+    this.server.headersTimeout = props?.headersTimeout ?? 90 * 1000;
   }
 
   public async init() {
