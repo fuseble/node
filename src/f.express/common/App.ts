@@ -13,6 +13,7 @@ import {
   createRouter,
   errorController,
   globalController,
+  getDebugCreator,
   type OpenAPIOptions,
   type IErrorProps,
   type IGlobalProps,
@@ -25,19 +26,19 @@ const defaultOpenAPIOptions: OpenAPIOptions = {
   urls: ['http://localhost:8000'],
 };
 
-type InitAppOpenAPI = {
-  path: string;
-  options?: OpenAPIOptions;
-  endPoint?: string;
-};
-
-export interface InitAppProps {
-  controllers: Record<string, any>;
+export interface AppProps {
+  controllers?: Record<string, any>;
   authControllers?: Record<string, ExpressController>;
   modelMap?: Record<string, any>;
   enums?: Record<string, any>;
-  openAPI?: InitAppOpenAPI;
+  openAPI?: {
+    path: string;
+    options?: OpenAPIOptions;
+    endPoint?: string;
+  };
 }
+
+const debug = getDebugCreator('app');
 
 export class App {
   public app: Application;
@@ -47,23 +48,25 @@ export class App {
   private authControllers?: Record<string, ExpressController>;
   private modelMap?: any;
   private enums?: any;
-  private openAPI?: InitAppOpenAPI;
+  private openAPI?: AppProps['openAPI'];
 
-  constructor(props: InitAppProps) {
+  constructor(props?: AppProps) {
     this.app = express();
     this.server = http.createServer(this.app);
 
-    this.controllers = props?.controllers;
-    this.authControllers = props?.authControllers;
-    this.modelMap = props?.modelMap;
-    this.enums = props?.enums;
+    if (props) {
+      this.controllers = props?.controllers ?? {};
+      this.authControllers = props?.authControllers;
+      this.modelMap = props?.modelMap;
+      this.enums = props?.enums;
 
-    if (props.openAPI?.path) {
-      this.openAPI = {
-        path: props.openAPI.path,
-        options: props.openAPI?.options || defaultOpenAPIOptions,
-        endPoint: props.openAPI?.endPoint || '/api-docs',
-      };
+      if (props.openAPI?.path) {
+        this.openAPI = {
+          path: props.openAPI.path,
+          options: props.openAPI?.options || defaultOpenAPIOptions,
+          endPoint: props.openAPI?.endPoint || '/api-docs',
+        };
+      }
     }
   }
 
@@ -75,6 +78,7 @@ export class App {
       headersTimeout?: number;
     },
   ) {
+    debug('app listen', port);
     this.server.listen(port, props?.callback);
     this.server.keepAliveTimeout = props?.keepAliveTimeout ?? 90 * 1000;
     this.server.headersTimeout = props?.headersTimeout ?? 90 * 1000;
@@ -89,6 +93,7 @@ export class App {
         enums: this.enums,
       });
       await fs.writeFileSync(this.openAPI.path, openAPI);
+      debug('openapi created', this.openAPI.path);
     }
   }
 
@@ -147,5 +152,3 @@ export class App {
     this.app.use(globalController(options?.globalOptions));
   }
 }
-
-export const ExpressApp = App;
