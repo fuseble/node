@@ -1,19 +1,22 @@
 {
   "name": "@fuseble.inc/node",
-  "version": "1.6.8",
+  "version": "1.6.9",
   "main": "build/index.js",
   "repository": "https://github.com/fuseble/node",
   "author": "AlpoxDev <contact@fuseble.com>",
   "license": "MIT",
   "scripts": {
     "clear": "rm -rf build",
-    "build": "yarn clear && tsc -p tsconfig.json",
-    "prepublishOnly": "yarn build",
+    "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
+    "deploy": "yarn clear && yarn build",
+    "test": "nodemon --config nodemon.json",
+    "prepublishOnly": "yarn deploy",
     "prepare": "husky install",
     "lint:staged": "lint-staged"
   },
   "dependencies": {
     "@prisma/client": "^3.10.0",
+    "@socket.io/redis-adapter": "^8.0.1",
     "ajv": "^8.11.0",
     "apple-auth": "^1.0.7",
     "axios": "^0.26.0",
@@ -21,6 +24,7 @@
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
     "crypto-js": "^4.1.1",
+    "debug": "^4.3.4",
     "dotenv": "^16.0.0",
     "events": "^3.3.0",
     "exceljs": "^4.3.0",
@@ -36,16 +40,19 @@
     "paypal-rest-sdk": "^1.8.1",
     "qrcode": "^1.5.0",
     "query-string": "^7.1.1",
+    "redis": "^4.5.1",
     "sendbird-platform-sdk": "^0.0.16",
     "sharp": "^0.31.2",
+    "socket.io": "^4.5.4",
     "swagger-ui-express": "^4.6.0",
-    "ts-node": "^10.8.2",
+    "ts-node": "^10.9.1",
     "yup": "^0.32.11"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/cors": "^2.8.13",
     "@types/crypto-js": "^4.1.1",
+    "@types/debug": "^4.1.7",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.15",
     "@types/flat": "^5.0.2",
@@ -66,6 +73,8 @@
     "lint-staged": "^13.0.2",
     "nodemon": "^2.0.15",
     "prettier": "^2.7.1",
+    "tsc-alias": "^1.8.2",
+    "tsconfig-paths": "^4.1.2",
     "typescript": "^4.5.4"
   },
   "lint-staged": {
