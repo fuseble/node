@@ -8,3 +8,4 @@ export * from './location';
 export * from './qrcode';
 export * from './smartDelivery';
 export * from './paypal';
+export * from './debug';

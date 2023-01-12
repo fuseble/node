@@ -16,6 +16,6 @@
     "typeRoots": ["./src/@types"],
     "declaration": true
   },
-  "include": ["src/**/*.ts", "src/*.ts", "files/*.ts"],
-  "exclude": ["node_modules", "dist", "src/example/*"]
+  "include": ["src/**/*.ts", "src/*.ts"],
+  "exclude": ["node_modules", "dist", "src/test.ts"]
 }

@@ -3,8 +3,21 @@ import http from 'http';
 import * as bodyParser from 'body-parser';
 import swaggerUi from 'swagger-ui-express';
 import fs from 'fs';
-import { createOpenAPI, OpenAPIOptions, Validator, json, urlencoded, cors, pagination } from '../../';
-import { createRouter, errorController, globalController, IErrorProps, IGlobalProps, ExpressController } from './index';
+import {
+  createOpenAPI,
+  Validator,
+  json,
+  urlencoded,
+  cors,
+  pagination,
+  createRouter,
+  errorController,
+  globalController,
+  type OpenAPIOptions,
+  type IErrorProps,
+  type IGlobalProps,
+  type ExpressController,
+} from 'index';
 
 const defaultOpenAPIOptions: OpenAPIOptions = {
   title: '@fuseble.inc/node',

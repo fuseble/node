@@ -1,6 +1,10 @@
 node_modules
 src
 
+.husky
 .git
+.eslintignore
+.eslintrc.json
+.gitignore
+nodemon.json
 yarn.lock
-test-sdk

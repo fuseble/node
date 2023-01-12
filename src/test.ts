@@ -22,9 +22,9 @@ const debug = getPrefixDebugCreator('test')('index');
   socket.addTasks([
     {
       key: 'message',
-      task: (socket, { data }) => {
+      task: (socket, { data, createdAt }) => {
         debug('message', data);
-        socket.emit('message', data);
+        socket.emit('message', { ...data, createdAt });
       },
     },
   ]);
