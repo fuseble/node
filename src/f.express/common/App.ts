@@ -13,18 +13,12 @@ import {
   createRouter,
   errorController,
   globalController,
-  getDebugCreator,
   type OpenAPIOptions,
   type IErrorProps,
   type IGlobalProps,
   type ExpressController,
 } from 'index';
-
-const defaultOpenAPIOptions: OpenAPIOptions = {
-  title: '@fuseble.inc/node',
-  version: '1.0.0',
-  urls: ['http://localhost:8000'],
-};
+import originDebug from 'f.debug';
 
 export interface AppProps {
   controllers?: Record<string, any>;
@@ -38,7 +32,13 @@ export interface AppProps {
   };
 }
 
-const debug = getDebugCreator('app');
+const defaultOpenAPIOptions: OpenAPIOptions = {
+  title: '@fuseble.inc/node',
+  version: '1.0.0',
+  urls: ['http://localhost:8000'],
+};
+
+const debug = originDebug('App');
 
 export class App {
   public app: Application;
@@ -78,7 +78,7 @@ export class App {
       headersTimeout?: number;
     },
   ) {
-    debug('app listen', port);
+    debug(`app listen ${port}`);
     this.server.listen(port, props?.callback);
     this.server.keepAliveTimeout = props?.keepAliveTimeout ?? 90 * 1000;
     this.server.headersTimeout = props?.headersTimeout ?? 90 * 1000;

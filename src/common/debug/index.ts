@@ -1,7 +1,7 @@
 import debug from 'debug';
 
 export const getDebugCreator = (name: string) => {
-  return debug(name);
+  return debug(`${name}:`);
 };
 
 export const getPrefixDebugCreator = (prefix: string) => {

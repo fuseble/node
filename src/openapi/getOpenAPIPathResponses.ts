@@ -41,9 +41,7 @@ const getOpenAPIPathResponses = (api: ControllerAPI) => {
         };
       }
     });
-  } else {
-    if (!api.schema) api.schema = (api.tags as string[])[0];
-
+  } else if (api.schema) {
     if (api.method === 'GET') {
       if (api.schema.includes('[]')) {
         api.schema = api.schema.replace('[]', '');

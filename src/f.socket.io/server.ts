@@ -1,5 +1,5 @@
 import http from 'http';
-import { Server, type Socket } from 'socket.io';
+import { Server, type ServerOptions, type Socket } from 'socket.io';
 import f_debug from 'f.debug';
 
 const debug = f_debug('socket.io');
@@ -29,8 +29,8 @@ export class SocketServer {
   public endTasks: SocketEndTask[] = [];
   public disconnectTasks: SocketDisconnectTask[] = [];
 
-  constructor(opts?: http.Server) {
-    this.io = new Server(opts);
+  constructor(http: http.Server, options?: Partial<ServerOptions>) {
+    this.io = new Server(http, options);
 
     this.io.on('connection', async socket => {
       debug(`socket connected, ${socket.id}`);

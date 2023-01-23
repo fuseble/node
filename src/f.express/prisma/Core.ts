@@ -1,7 +1,7 @@
 import { type Request, type Response, type NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { flatten, unflatten } from 'flat';
-import { type ExpressController } from '../index';
+import { type ExpressController } from 'index';
 
 export enum ModelAction {
   findUnique = 'findUnique',
