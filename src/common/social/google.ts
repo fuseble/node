@@ -34,8 +34,9 @@ export class Google {
   }
 
   public async getToken(code: string): Promise<string | undefined> {
-    if (this.clientSecret || this.redirectUri)
+    if (!this.clientSecret || !this.redirectUri) {
       throw { status: 500, message: 'Google Client Secret or Redirect Url is not defined' };
+    }
 
     const data = {
       client_id: this.clientId,
