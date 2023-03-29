@@ -1,12 +1,12 @@
 {
   "name": "@fuseble.inc/node",
-  "version": "1.7.3",
+  "version": "1.7.4",
   "main": "build/index.js",
   "repository": "https://github.com/fuseble/node",
   "author": "AlpoxDev <contact@fuseble.com>",
   "license": "MIT",
   "scripts": {
-    "clear": "rm -rf build",
+    "clear": "rimraf build",
     "build": "tsc -p tsconfig.json && tsc-alias -p tsconfig.json",
     "deploy": "yarn clear && yarn build",
     "test": "nodemon --config nodemon.json",
