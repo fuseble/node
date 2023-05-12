@@ -17,8 +17,8 @@ import {
   type IErrorProps,
   type IGlobalProps,
   type ExpressController,
-} from 'index';
-import originDebug from 'f.debug';
+} from '@/index';
+import originDebug from '@/debug';
 
 export interface AppProps {
   controllers?: Record<string, any>;

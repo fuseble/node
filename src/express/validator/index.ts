@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Ajv, { ErrorObject, JSONSchemaType, Options, ValidateFunction } from 'ajv';
 import type { JTDDataType } from 'ajv/dist/jtd';
-import { ControllerAPI, ValidatorItem } from '../../openapi';
+import { ControllerAPI, ValidatorItem } from '@/openapi';
 
 export { Ajv };
 export type { JSONSchemaType, JTDDataType };

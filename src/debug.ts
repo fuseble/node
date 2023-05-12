@@ -1,4 +1,4 @@
-import { getPrefixDebugCreator } from 'common/debug';
+import { getPrefixDebugCreator } from '@/common/debug';
 
 const debug = getPrefixDebugCreator('fuseble');
 

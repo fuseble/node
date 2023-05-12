@@ -1,8 +1,17 @@
 {
   "compilerOptions": {
     "outDir": "build",
-    "baseUrl": "src",
     "rootDir": "src",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@/common": ["./src/common"],
+      "@/common/*": ["./src/common/*"],
+      "@/express": ["./src/express"],
+      "@/express/*": ["./src/express/*"],
+      "@/openapi": ["./src/openapi"],
+      "@/openapi/*": ["./src/openapi/*"],
+      "@/debug": ["./src/debug.ts"]
+    },
     "target": "es2018",
     "module": "commonjs",
     "strict": true,

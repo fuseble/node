@@ -1,6 +1,5 @@
 import type { Application } from 'express';
-import { ExpressController } from './index';
-import type { ControllerAPI, ControllerAPIMethodLowerCase } from '../../openapi';
+import type { ExpressController, ControllerAPI, ControllerAPIMethodLowerCase } from '@/index';
 
 export interface CreateRouterProps {
   app: Application;
