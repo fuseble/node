@@ -78,11 +78,9 @@
   },
   "lint-staged": {
     "*.{js,jsx}": [
-      "eslint --fix --ext .ts,.tsx",
       "prettier --parser flow --write"
     ],
     "*.{ts,tsx}": [
-      "eslint --fix",
       "prettier --parser babel-ts --write"
     ]
   }
